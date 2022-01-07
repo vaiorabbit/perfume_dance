@@ -1,7 +1,7 @@
 # Perfume Dance #
 
 *   Created : 2014-05-12
-*   Last modified : 2018-10-09
+*   Last modified : 2021-01-08
 
 <img src="https://raw.githubusercontent.com/vaiorabbit/perfume_dance/master/doc/perfume_dance_00.png" width="200"> <img src="https://raw.githubusercontent.com/vaiorabbit/perfume_dance/master/doc/perfume_dance_01.png" width="200"> <img src="https://raw.githubusercontent.com/vaiorabbit/perfume_dance/master/doc/perfume_dance_02.png" width="200">
 
@@ -20,8 +20,8 @@ A BVH motion parser and playback implementation used to make the video:
 
 *   OpenGL 4.1 capable GPU
 
-*   Ruby OpenGL Bindings ( https://github.com/vaiorabbit/ruby-opengl )
-    *   $ gem install opengl-bindings
+*   Ruby OpenGL Bindings Version 2 ( https://github.com/vaiorabbit/ruby-opengl )
+    *   $ gem install opengl-bindings2
 
 *   GLFW DLL
     *   https://www.glfw.org (Windows)
@@ -54,7 +54,7 @@ A BVH motion parser and playback implementation used to make the video:
 All source codes are available under the terms of the zlib/libpng license.
 
     Perfume Dance
-    Copyright (c) 2014-2018 vaiorabbit
+    Copyright (c) 2014-2021 vaiorabbit
 
     This software is provided 'as-is', without any express or implied
     warranty. In no event will the authors be held liable for any damages

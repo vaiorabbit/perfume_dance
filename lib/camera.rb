@@ -5,7 +5,7 @@ class SphericalCoordCamera
   attr_reader :width, :height, :fovy_deg, :position
   attr_accessor :radius, :radius_min, :radius_max, :at, :z_near, :z_far
 
-  def initialize( phi = Math::PI/2.0, theta = Math::PI/3.0, radius = 20.0, radius_min = 5.0, radius_max = 30.0 )
+  def initialize(phi = Math::PI/2.0, theta = Math::PI/3.0, radius = 20.0, radius_min = 5.0, radius_max = 30.0)
     @mouse_state = 0
     @prev_x = 0
     @prev_y = 0
@@ -17,11 +17,11 @@ class SphericalCoordCamera
 
     wrap_params()
 
-    @position = RVec3.new( @radius * Math.sin(@theta) * Math.cos(@phi), @radius * Math.cos(@theta), @radius * Math.sin(@theta) * Math.sin(@phi) )
-    @at       = RVec3.new( 0, 0, 0 )
-    @up       = RVec3.new( 0, 1, 0 )
+    @position = RVec3.new(@radius * Math.sin(@theta) * Math.cos(@phi), @radius * Math.cos(@theta), @radius * Math.sin(@theta) * Math.sin(@phi))
+    @at       = RVec3.new(0, 0, 0)
+    @up       = RVec3.new(0, 1, 0)
 
-    @mtxView = RMtx4.new.lookAtRH( @position, @at, @up )
+    @mtxView = RMtx4.new.lookAtRH(@position, @at, @up)
 
     @width    = 640
     @height   = 340
@@ -29,7 +29,7 @@ class SphericalCoordCamera
     @z_near   = 0.1
     @z_far    = 200.0
 
-    @mtxProj = RMtx4.new.perspectiveFovRH( Math::PI * @fovy_deg / 180.0, @width.to_f/@height.to_f, @z_near, @z_far )
+    @mtxProj = RMtx4.new.perspectiveFovRH(Math::PI * @fovy_deg / 180.0, @width.to_f/@height.to_f, @z_near, @z_far)
 
     @mtxPVInv = RMtx4.new.setIdentity
 
@@ -38,39 +38,39 @@ class SphericalCoordCamera
     @renew_pvinv = true
   end
 
-  def width= ( w )
+  def width= (w)
     return if @width == w
     @width = w
     @renew_proj = true
     @renew_pvinv = true
   end
 
-  def height= ( h )
+  def height= (h)
     return if @height == h
     @height = h
     @renew_proj = true
     @renew_pvinv = true
   end
 
-  def set_mouse_state( button, state, x, y )
-    if button == GLFW_MOUSE_BUTTON_LEFT
-      if state == GLFW_PRESS
+  def set_mouse_state(button, state, x, y)
+    if button == GLFW::MOUSE_BUTTON_LEFT
+      if state == GLFW::PRESS
         @mouse_state |= 1
-      else # GLFW_RELEASE
+      else # GLFW::RELEASE
         @mouse_state &= ~1
       end
     end
-    if button == GLFW_MOUSE_BUTTON_RIGHT
-      if state == GLFW_PRESS
+    if button == GLFW::MOUSE_BUTTON_RIGHT
+      if state == GLFW::PRESS
         @mouse_state |= 2
-      else # GLFW_RELEASE
+      else # GLFW::RELEASE
         @mouse_state &= ~2
       end
     end
-    if button == GLFW_MOUSE_BUTTON_MIDDLE
-      if state == GLFW_PRESS
+    if button == GLFW::MOUSE_BUTTON_MIDDLE
+      if state == GLFW::PRESS
         @mouse_state |= 4
-      else # GLFW_RELEASE
+      else # GLFW::RELEASE
         @mouse_state &= ~4
       end
     end
@@ -79,10 +79,10 @@ class SphericalCoordCamera
   end
 
 
-  def update_from_mouse_motion( x, y )
+  def update_from_mouse_motion(x, y)
     if @mouse_state != 0
-      dx = ( x - @prev_x ).to_f
-      dy = ( y - @prev_y ).to_f
+      dx = (x - @prev_x).to_f
+      dy = (y - @prev_y).to_f
 
       if @mouse_state == 1 # Left
         scale = 0.5
@@ -122,7 +122,7 @@ class SphericalCoordCamera
   def get_view_matrix
     if @renew_view
       @renew_view = false
-      @mtxView.lookAtRH( @position, @at, @up )
+      @mtxView.lookAtRH(@position, @at, @up)
     end
     return @mtxView
   end
@@ -131,7 +131,7 @@ class SphericalCoordCamera
   def get_projection_matrix
     if @renew_proj
       @renew_proj = false
-      @mtxProj.perspectiveFovRH( Math::PI * @fovy_deg / 180.0, @width.to_f/@height.to_f, @z_near, @z_far )
+      @mtxProj.perspectiveFovRH(Math::PI * @fovy_deg / 180.0, @width.to_f/@height.to_f, @z_near, @z_far)
     end
     return @mtxProj
   end
@@ -145,18 +145,18 @@ class SphericalCoordCamera
   end
 
   # Ref.: http://www.opengl.org/wiki/GluProject_and_gluUnProject_code
-  def unproject( win_x, win_y, win_z )
-    v= RVec4.new( 2.0 * (win_x - @width) / @width.to_f + 1.0,
+  def unproject(win_x, win_y, win_z)
+    v= RVec4.new(2.0 * (win_x - @width) / @width.to_f + 1.0,
                   2.0 * (@height - win_y) / @height.to_f - 1.0,
                   win_z,
-                  1.0 )
-    v.transform!( get_mtxPVInv )
-    return RVec3.new( v.x/v.w, v.y/v.w, v.z/v.w )
+                  1.0)
+    v.transform!(get_mtxPVInv)
+    return RVec3.new(v.x/v.w, v.y/v.w, v.z/v.w)
   end
 
-  def get_pick_ray( win_x, win_y )
-    ray_orig = unproject( win_x, win_y, -1.0 )
-    ray_dest = unproject( win_x, win_y,  1.0 )
+  def get_pick_ray(win_x, win_y)
+    ray_orig = unproject(win_x, win_y, -1.0)
+    ray_dest = unproject(win_x, win_y,  1.0)
     ray_dir = (ray_dest - ray_orig).normalize!
     return ray_orig, ray_dir
   end

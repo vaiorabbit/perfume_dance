@@ -9,13 +9,13 @@ module Motion
 
     attr_reader :joints
 
-    def initialize( root_joint )
+    def initialize(root_joint)
       @root_joint = root_joint
       @joints = []
-      add_joint( @root_joint )
+      add_joint(@root_joint)
     end
 
-    def add_joint( joint )
+    def add_joint(joint)
       @joints << joint
       joint.children.each do |child|
         add_joint(child)
@@ -23,11 +23,11 @@ module Motion
     end
     private :add_joint
 
-    def find_joint_index( name )
+    def find_joint_index(name)
       return @joints.index { |joint| joint.name == name }
     end
 
-    def get_joint( index )
+    def get_joint(index)
       return @joints[index]
     end
 
@@ -35,28 +35,28 @@ module Motion
       return @joints.length
     end
 
-    def set_position( x, y, z )
-      @root_joint.set_position( x, y, z )
+    def set_position(x, y, z)
+      @root_joint.set_position(x, y, z)
     end
 
-    def set_rotation( q )
-      @root_joint.set_rotation( q )
+    def set_rotation(q)
+      @root_joint.set_rotation(q)
     end
 
-    def draw_skeleton_recursive( joint, mtx_accum, depth, im_bone, im_sphere )
+    def draw_skeleton_recursive(joint, mtx_accum, depth, im_bone, im_sphere)
       mtx_current = mtx_accum * joint.local_transform
-      im_sphere.set_model_matrix( mtx_current )
+      im_sphere.set_model_matrix(mtx_current)
       im_sphere.draw
 
       joint.children.each do |child|
-        im_bone.set_model_matrix( mtx_current * child.mtx_bone_rotation * child.mtx_bone_scale )
+        im_bone.set_model_matrix(mtx_current * child.mtx_bone_rotation * child.mtx_bone_scale)
         im_bone.draw
-        draw_skeleton_recursive( child, mtx_current, depth+1, im_bone, im_sphere )
+        draw_skeleton_recursive(child, mtx_current, depth+1, im_bone, im_sphere)
       end
     end
     private :draw_skeleton_recursive
 
-    def draw_skeleton( im_bone, im_sphere )
+    def draw_skeleton(im_bone, im_sphere)
       mtx_root = @root_joint.local_transform
       im_sphere.set_model_matrix(mtx_root)
       im_sphere.draw
@@ -64,18 +64,18 @@ module Motion
       @root_joint.children.each do |child|
         im_bone.set_model_matrix(mtx_root * child.mtx_bone_rotation * child.mtx_bone_scale)
         im_bone.draw
-        draw_skeleton_recursive( child, mtx_root, 1, im_bone, im_sphere )
+        draw_skeleton_recursive(child, mtx_root, 1, im_bone, im_sphere)
       end
     end
 
-    def set_pose( motion_data, frame )
+    def set_pose(motion_data, frame)
       return if motion_data.joint_count != get_joint_count()
 
       pos = motion_data.get_position(frame)
-      set_position( pos.x, pos.y, pos.z )
+      set_position(pos.x, pos.y, pos.z)
 
       motion_data.joint_count.times do |joint_index|
-        get_joint(joint_index).set_rotation( motion_data.get_rotation(frame, joint_index) )
+        get_joint(joint_index).set_rotation(motion_data.get_rotation(frame, joint_index))
       end
     end
 
@@ -84,7 +84,7 @@ module Motion
   class Joint
     attr_accessor :name, :parent, :children, :rotation, :position, :default_transform
     attr_reader :offset, :mtx_offset, :mtx_bone_rotation, :mtx_bone_scale
-    def initialize( parent, name = "" )
+    def initialize(parent, name = "")
       @name = name
 
       # Tree structure
@@ -98,7 +98,7 @@ module Motion
 
       # Updated via MotionData
       @rotation = RQuat.new(0, 0, 0, 1)
-#      @rotation = RQuat.new.rotationAxis( RVec3.new(1,1,0).normalize!, 30.0*Math::PI/180.0 )
+#      @rotation = RQuat.new.rotationAxis(RVec3.new(1,1,0).normalize!, 30.0*Math::PI/180.0)
       @position = RVec3.new(0, 0, 0)
       @mtx_position = RMtx4.new.translation(@position.x, @position.y, @position.z)
       @mtx_rotation = RMtx4.new.rotationQuaternion(@rotation)
@@ -108,27 +108,27 @@ module Motion
       @mtx_bone_scale = RMtx4.new.setIdentity
     end
 
-    def set_offset( x, y, z )
-      @offset.setElements( x, y, z )
-      @mtx_offset.translation( x, y, z )
+    def set_offset(x, y, z)
+      @offset.setElements(x, y, z)
+      @mtx_offset.translation(x, y, z)
 
-      @mtx_bone_scale.scaling( @offset.getLength, 1.0, 1.0 )
+      @mtx_bone_scale.scaling(@offset.getLength, 1.0, 1.0)
 
       dir = @offset.getNormalized
       dot = RVec3.dot(XAxis, dir)
       bone_rot_axis = (1.0 - dot.abs <= RMath3D::TOLERANCE) ? ZAxis : RVec3.cross(XAxis, dir).normalize!
-      bone_rot_theta = Math.acos( dot )
+      bone_rot_theta = Math.acos(dot)
 puts "#{@name} : #{bone_rot_axis}"
-      @mtx_bone_rotation.rotationAxis( bone_rot_axis, bone_rot_theta )
+      @mtx_bone_rotation.rotationAxis(bone_rot_axis, bone_rot_theta)
     end
 
-    def set_position( x, y, z )
-      @position.setElements( x, y, z )
+    def set_position(x, y, z)
+      @position.setElements(x, y, z)
       @mtx_position.translation(@position.x, @position.y, @position.z)
     end
 
-    def set_rotation( q )
-      @rotation.setElements( q.x, q.y, q.z, q.w )
+    def set_rotation(q)
+      @rotation.setElements(q.x, q.y, q.z, q.w)
       @mtx_rotation.rotationQuaternion(@rotation)
     end
 
@@ -141,7 +141,7 @@ puts "#{@name} : #{bone_rot_axis}"
   class MotionData
     attr_reader :frame_count, :joint_count
 
-    def initialize( frame_count, joint_count )
+    def initialize(frame_count, joint_count)
       @frame_count = frame_count
       @joint_count = joint_count
 
@@ -149,19 +149,19 @@ puts "#{@name} : #{bone_rot_axis}"
       @rotation_data = Array.new(frame_count * joint_count) { RQuat.new.setIdentity }
     end
 
-    def set_position( frame, vec_pos )
-      @position_data[frame].setElements( vec_pos.x, vec_pos.y, vec_pos.z )
+    def set_position(frame, vec_pos)
+      @position_data[frame].setElements(vec_pos.x, vec_pos.y, vec_pos.z)
     end
 
-    def get_position( frame )
+    def get_position(frame)
       return @position_data[frame]
     end
 
-    def set_rotation( frame, joint_index, quat )
-      @rotation_data[@joint_count * frame + joint_index].setElements( quat.x, quat.y, quat.z, quat.w )
+    def set_rotation(frame, joint_index, quat)
+      @rotation_data[@joint_count * frame + joint_index].setElements(quat.x, quat.y, quat.z, quat.w)
     end
 
-    def get_rotation( frame, joint_index )
+    def get_rotation(frame, joint_index)
       @rotation_data[@joint_count * frame + joint_index]
     end
 
@@ -191,7 +191,7 @@ module BVHFormat
     "Zposition" => Order::POS_Z,
   }
 
-  def self.order_id( name )
+  def self.order_id(name)
     return @@order_id_map[name]
   end
 
@@ -199,7 +199,7 @@ module BVHFormat
 
     attr_reader :root_joint, :motion_data
 
-    def initialize( bvh_file )
+    def initialize(bvh_file)
       @bvh = bvh_file
       @orders = []
 
@@ -207,11 +207,11 @@ module BVHFormat
       @motion_data = nil
     end
 
-    def parse_hierarchy_children( parent_node, name, orders )
+    def parse_hierarchy_children(parent_node, name, orders)
       line = @bvh.readline.strip
       return nil if line != "{"
 
-      node = Motion::Joint.new( parent_node, name )
+      node = Motion::Joint.new(parent_node, name)
 
       until @bvh.eof?
         line = @bvh.readline.strip
@@ -219,7 +219,7 @@ module BVHFormat
         section = tokens.shift
         case section
         when "OFFSET"
-          node.set_offset( tokens[0].to_f, tokens[1].to_f, tokens[2].to_f )
+          node.set_offset(tokens[0].to_f, tokens[1].to_f, tokens[2].to_f)
 
         when "CHANNELS"
           order_id = []
@@ -230,10 +230,10 @@ module BVHFormat
           orders << order_id
 
         when "JOINT"
-          parse_hierarchy_children( node, tokens[0], orders )
+          parse_hierarchy_children(node, tokens[0], orders)
 
         when "End"
-          parse_hierarchy_end( node, tokens[0] )
+          parse_hierarchy_end(node, tokens[0])
           orders << nil
 
         when "}"
@@ -248,7 +248,7 @@ module BVHFormat
       return nil
     end
 
-    def parse_hierarchy_end( parent_node, name )
+    def parse_hierarchy_end(parent_node, name)
       line = @bvh.readline.strip
       return nil if line != "{"
 
@@ -261,8 +261,8 @@ module BVHFormat
       line = @bvh.readline.strip
       return nil if line != "}"
 
-      node = Motion::Joint.new( parent_node, name )
-      node.set_offset( ofs_x, ofs_y, ofs_z )
+      node = Motion::Joint.new(parent_node, name)
+      node.set_offset(ofs_x, ofs_y, ofs_z)
 
       parent_node.children << node
     end
@@ -277,7 +277,7 @@ module BVHFormat
 
       root_name = tokens[1]
 
-      @root_joint = parse_hierarchy_children( nil, root_name, @orders )
+      @root_joint = parse_hierarchy_children(nil, root_name, @orders)
 
       return @root_joint != nil
     end
@@ -300,7 +300,7 @@ module BVHFormat
 
       joint_count = @orders.length
 
-      @motion_data = Motion::MotionData.new( frame_count, joint_count )
+      @motion_data = Motion::MotionData.new(frame_count, joint_count)
 
       #
       # frame data
@@ -324,9 +324,9 @@ module BVHFormat
             order_array.each do |order|
               val = ("%f" % tokens[token_index]).to_f
               case order
-              when BVHFormat::Order::ROT_X; mtx_rot.rotationX( val * Math::PI/180.0 )
-              when BVHFormat::Order::ROT_Y; mtx_rot.rotationY( val * Math::PI/180.0 )
-              when BVHFormat::Order::ROT_Z; mtx_rot.rotationZ( val * Math::PI/180.0 )
+              when BVHFormat::Order::ROT_X; mtx_rot.rotationX(val * Math::PI/180.0)
+              when BVHFormat::Order::ROT_Y; mtx_rot.rotationY(val * Math::PI/180.0)
+              when BVHFormat::Order::ROT_Z; mtx_rot.rotationZ(val * Math::PI/180.0)
               when BVHFormat::Order::POS_X; mot_pos.x = val
               when BVHFormat::Order::POS_Y; mot_pos.y = val
               when BVHFormat::Order::POS_Z; mot_pos.z = val
@@ -336,9 +336,9 @@ module BVHFormat
             end
           end
 
-          mot_quat.rotationMatrix( mtx_accum )
-          @motion_data.set_position( f, mot_pos ) if joint_index == 0
-          @motion_data.set_rotation( f, joint_index, mot_quat )
+          mot_quat.rotationMatrix(mtx_accum)
+          @motion_data.set_position(f, mot_pos) if joint_index == 0
+          @motion_data.set_rotation(f, joint_index, mot_quat)
         end
 
       end
@@ -346,8 +346,8 @@ module BVHFormat
     end
   end
 
-  def self.parse( bvh_file )
-    parser = Parser.new( bvh_file )
+  def self.parse(bvh_file)
+    parser = Parser.new(bvh_file)
     succeeded = parser.parse_hierarchy()
     return nil if not succeeded
     succeeded = parser.parse_motion()
@@ -401,15 +401,15 @@ module AcclaimFormat
       "rz" => Order::ROT_Z,
     }
 
-    def self.order_id( name )
+    def self.order_id(name)
       return @@order_id_map[name]
     end
 
-    def self.dof_id( name )
+    def self.dof_id(name)
       return @@dof_id_map[name]
     end
 
-    def initialize( asf_file )
+    def initialize(asf_file)
       @asf = asf_file
       @current_line = nil
       @current_tokens = nil
@@ -423,7 +423,7 @@ module AcclaimFormat
       @joints = Hash.new
 
       @basis['root'] = RMtx4.new.setIdentity
-      @root_joint   = Motion::Joint.new( nil, 'root' )
+      @root_joint   = Motion::Joint.new(nil, 'root')
       @length_coeff = 1.0
     end
 
@@ -435,7 +435,7 @@ module AcclaimFormat
       return line
     end
 
-    def get_section( token )
+    def get_section(token)
       case token
       when ':version';       return Section::VERSION
       when ':name';          return Section::NAME
@@ -448,8 +448,8 @@ module AcclaimFormat
       end
     end
 
-    def set_section( token )
-      section_here = get_section( token )
+    def set_section(token)
+      section_here = get_section(token)
       section_changed = (section_here != Section::UNKNOWN) && (@current_section != section_here)
       @current_section = section_here if section_changed
     end
@@ -470,7 +470,7 @@ module AcclaimFormat
         case @current_tokens[0]
       # when 'axis';  puts "axis: #{tokens[1]}"
       # when 'orientation'; puts "orientation: #{tokens[1...tokens.length]}"
-        when 'position'; @root_joint.set_position( @current_tokens[1].to_f, @current_tokens[2].to_f, @current_tokens[3].to_f )
+        when 'position'; @root_joint.set_position(@current_tokens[1].to_f, @current_tokens[2].to_f, @current_tokens[3].to_f)
         when 'order'
           order_id = []
           @current_tokens[1...@current_tokens.length].each do |token|
@@ -495,7 +495,7 @@ module AcclaimFormat
         case @current_tokens[0]
         when 'id';      # puts "id: #{@current_tokens[1...@current_tokens.length]}"
         when 'name';      joint_name = @current_tokens[1]
-        when 'direction'; joint_dir.setElements( ("%f" % @current_tokens[1]).to_f, ("%f" % @current_tokens[2]).to_f, ("%f" % @current_tokens[3]).to_f )
+        when 'direction'; joint_dir.setElements(("%f" % @current_tokens[1]).to_f, ("%f" % @current_tokens[2]).to_f, ("%f" % @current_tokens[3]).to_f)
         when 'length';    joint_length = @current_tokens[1].to_f
 
         when 'axis';
@@ -506,9 +506,9 @@ module AcclaimFormat
           order = @current_tokens.last.scan(/./) # ex.) @current_tokens.last == 'XYZ' -> order == ['X', 'Y', 'Z']
           order.each do |sym|
             case sym
-            when 'X'; mtx_rot.rotationX( rot_angles[0] )
-            when 'Y'; mtx_rot.rotationY( rot_angles[1] )
-            when 'Z'; mtx_rot.rotationZ( rot_angles[2] )
+            when 'X'; mtx_rot.rotationX(rot_angles[0])
+            when 'Y'; mtx_rot.rotationY(rot_angles[1])
+            when 'Z'; mtx_rot.rotationZ(rot_angles[2])
             end
             mtx_basis = mtx_rot * mtx_basis
           end
@@ -533,9 +533,9 @@ module AcclaimFormat
 
         when 'end'
           joint_dir = joint_length * joint_dir
-          joint_offset = joint_dir.transformCoord( @basis[joint_name].getTransposed )
-          joint = Motion::Joint.new( nil, joint_name ) # [NOTE] parent joint will be set up later (in parse_hierarchy)
-          joint.set_offset( joint_offset.x, joint_offset.y, joint_offset.z )
+          joint_offset = joint_dir.transformCoord(@basis[joint_name].getTransposed)
+          joint = Motion::Joint.new(nil, joint_name) # [NOTE] parent joint will be set up later (in parse_hierarchy)
+          joint.set_offset(joint_offset.x, joint_offset.y, joint_offset.z)
           @joints[joint_name] = joint
           @orders[joint_name] = order_id
           order_id = []
@@ -564,25 +564,25 @@ module AcclaimFormat
     def update()
       @current_line = readline_from_asf()
       @current_tokens = @current_line.scan(/[^\s]+/)
-      set_section( @current_tokens[0] )
+      set_section(@current_tokens[0])
     end
 
-    def fixup_joints( parent_joint, offset )
+    def fixup_joints(parent_joint, offset)
       if parent_joint.children.length > 0
         parent_joint.children.each do |child|
-          fixup_joints( child, parent_joint.offset )
+          fixup_joints(child, parent_joint.offset)
         end
       else
         name = "Site#{"%03d" % @site_id}"
-        site_joint = Motion::Joint.new( parent_joint, name )
-        site_joint.set_offset( parent_joint.offset.x, parent_joint.offset.y, parent_joint.offset.z )
+        site_joint = Motion::Joint.new(parent_joint, name)
+        site_joint.set_offset(parent_joint.offset.x, parent_joint.offset.y, parent_joint.offset.z)
         parent_joint.children << site_joint
         @joints[name] = site_joint
         @basis[name] = RMtx4.new.setIdentity
         @site_id += 1
       end
       offset *= 3.0
-      parent_joint.set_offset( offset.x, offset.y, offset.z ) #if parent_joint != @root_joint
+      parent_joint.set_offset(offset.x, offset.y, offset.z) #if parent_joint != @root_joint
     end
 
     def parse()
@@ -602,7 +602,7 @@ module AcclaimFormat
       end
 
       @site_id = 0
-      fixup_joints( @root_joint, RVec3.new(0.0, 0.0, 0.0) )
+      fixup_joints(@root_joint, RVec3.new(0.0, 0.0, 0.0))
 
       return true
     end
@@ -612,7 +612,7 @@ module AcclaimFormat
   class AMCParser
     attr_reader :motion_data
 
-    def initialize( amc_file, skeleton, asf_orders, asf_basis )
+    def initialize(amc_file, skeleton, asf_orders, asf_basis)
       @amc = amc_file
       @current_line = nil
       @current_tokens = nil
@@ -639,7 +639,7 @@ module AcclaimFormat
       mot_quat = RQuat.new
       mtx_accum = RMtx4.new.setIdentity
       mtx_rot = RMtx4.new.setIdentity
-      @motion_data = Motion::MotionData.new( frame_count, @skeleton.get_joint_count )
+      @motion_data = Motion::MotionData.new(frame_count, @skeleton.get_joint_count)
       until @amc.eof?
         update()
         case @current_tokens.length
@@ -658,9 +658,9 @@ module AcclaimFormat
           order.each do |id|
             val = ("%f" % @current_tokens[token_index]).to_f
             case id
-            when ASFParser::Order::ROT_X; mtx_rot.rotationX( val * Math::PI/180.0 )
-            when ASFParser::Order::ROT_Y; mtx_rot.rotationY( val * Math::PI/180.0 )
-            when ASFParser::Order::ROT_Z; mtx_rot.rotationZ( val * Math::PI/180.0 )
+            when ASFParser::Order::ROT_X; mtx_rot.rotationX(val * Math::PI/180.0)
+            when ASFParser::Order::ROT_Y; mtx_rot.rotationY(val * Math::PI/180.0)
+            when ASFParser::Order::ROT_Z; mtx_rot.rotationZ(val * Math::PI/180.0)
             when ASFParser::Order::POS_X; mot_pos.x = val
             when ASFParser::Order::POS_Y; mot_pos.y = val
             when ASFParser::Order::POS_Z; mot_pos.z = val
@@ -675,9 +675,9 @@ module AcclaimFormat
             mtx_joint = mtx_joint * mtx_parent_joint
           end
           mtx_accum = mtx_joint * mtx_accum
-          mot_quat.rotationMatrix( mtx_accum )
-          @motion_data.set_position( current_frame-1, mot_pos ) if joint_index == 0
-          @motion_data.set_rotation( current_frame-1, joint_index, mot_quat )
+          mot_quat.rotationMatrix(mtx_accum)
+          @motion_data.set_position(current_frame-1, mot_pos) if joint_index == 0
+          @motion_data.set_rotation(current_frame-1, joint_index, mot_quat)
         end
       end
 
@@ -698,16 +698,16 @@ module AcclaimFormat
     end
   end # class AMCParser
 
-  def self.parse_asf( asf_file )
-    parser = ASFParser.new( asf_file )
+  def self.parse_asf(asf_file)
+    parser = ASFParser.new(asf_file)
     succeeded = parser.parse()
     return nil if not succeeded
 
     return parser
   end
 
-  def self.parse_amc( amc_file, skeleton, asf_orders, asf_basis )
-    parser = AMCParser.new( amc_file, skeleton, asf_orders, asf_basis )
+  def self.parse_amc(amc_file, skeleton, asf_orders, asf_basis)
+    parser = AMCParser.new(amc_file, skeleton, asf_orders, asf_basis)
     succeeded = parser.parse()
     return nil if not succeeded
 

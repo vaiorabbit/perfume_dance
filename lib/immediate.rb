@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- Coding: utf-8 -*-
 
 # Ref.:
 # * C++ code to emulate openGL old direct mode drawing http://rodolphe-vaillant.fr/?e=8
@@ -35,15 +35,15 @@ class ImmediateDraw
   end
 
   @@mode_map = {
-    Mode::POINTS          => GL_POINTS,
-    Mode::LINE_STRIP      => GL_LINE_STRIP,
-    Mode::LINE_LOOP       => GL_LINE_LOOP,
-    Mode::LINES           => GL_LINES,
-    Mode::TRIANGLE_FAN    => GL_TRIANGLE_FAN,
-    Mode::TRIANGLES       => GL_TRIANGLES,
-    Mode::TRIANGLE_STRIP  => GL_TRIANGLE_STRIP,
-    Mode::QUADS           => GL_QUADS,
-    Mode::QUAD_STRIP      => GL_QUAD_STRIP,
+    Mode::POINTS          => GL::POINTS,
+    Mode::LINE_STRIP      => GL::LINE_STRIP,
+    Mode::LINE_LOOP       => GL::LINE_LOOP,
+    Mode::LINES           => GL::LINES,
+    Mode::TRIANGLE_FAN    => GL::TRIANGLE_FAN,
+    Mode::TRIANGLES       => GL::TRIANGLES,
+    Mode::TRIANGLE_STRIP  => GL::TRIANGLE_STRIP,
+    Mode::QUADS           => GL::QUADS,
+    Mode::QUAD_STRIP      => GL::QUAD_STRIP,
   }
 
   @@attribute_size = {
@@ -75,7 +75,7 @@ class ImmediateDraw
   void main()
   {
     // Preparing for view-space calculation
-    vec3 vecVertexPosInView = vec3( mtxMV * vi_vecPosition );
+    vec3 vecVertexPosInView = vec3(mtxMV * vi_vecPosition);
     vec3 vecLightDirInView = normalize(vecLightPosInView - vecVertexPosInView);
     vec3 vecEyeDirInView = normalize(vec3(0.0, 0.0, 0.0) - vecVertexPosInView);
     vec3 vecHalfwayDir = normalize(vecLightDirInView + vecEyeDirInView);
@@ -108,11 +108,11 @@ class ImmediateDraw
   void main()
   {
     vec4 rgbaDiffuseTexture = texture(tsDiffuseTexure, fi_vecTexcoord.xy);
-    if ( sUseTexture == 0 ) {
+    if (sUseTexture == 0) {
       rgbaDiffuseTexture = vec4(1.0, 1.0, 1.0, 1.0);
     }
 
-    if ( sUseLighting == 1 ) {
+    if (sUseLighting == 1) {
       float fSpecularPower = 4.0, fAmbeintScale = 0.1;
       float NdotL = dot(normalize(fi_vecNormalInView), normalize(fi_vecLightDirInView));
       float NdotH = dot(normalize(fi_vecNormalInView), normalize(fi_vecHalfwayDir));
@@ -128,7 +128,7 @@ class ImmediateDraw
 
   def self.setup
     @@immediate_shader = Shader.new
-    @@immediate_shader.load( vertex_code: @@immediate_vert_shader_source, fragment_code: @@immediate_frag_shader_source )
+    @@immediate_shader.load(vertex_code: @@immediate_vert_shader_source, fragment_code: @@immediate_frag_shader_source)
   end
 
   def self.release
@@ -146,15 +146,15 @@ class ImmediateDraw
     @prim_mode = Mode::UNKNOWN
     @begin_called = false
 
-    @bufs = Array.new( Attribute::COUNT ) { Array.new( Mode::COUNT ) { [] } } # array of Float
-    @vbos = Array.new( Attribute::COUNT ) { Array.new( Mode::COUNT ) { [] } } # array of BufferObject
-    @vaos = Array.new( Mode::COUNT ) { [] }
+    @bufs = Array.new(Attribute::COUNT) { Array.new(Mode::COUNT) { [] } } # array of Float
+    @vbos = Array.new(Attribute::COUNT) { Array.new(Mode::COUNT) { [] } } # array of BufferObject
+    @vaos = Array.new(Mode::COUNT) { [] }
 
-    @attribute_value = Array.new( Attribute::COUNT )
-    @attribute_value[Attribute::POSITION]  = Array.new( @@attribute_size[Attribute::POSITION] )
-    @attribute_value[Attribute::NORMAL]    = Array.new( @@attribute_size[Attribute::NORMAL] )
-    @attribute_value[Attribute::TEXCOORD]  = Array.new( @@attribute_size[Attribute::TEXCOORD] )
-    @attribute_value[Attribute::COLOR]     = Array.new( @@attribute_size[Attribute::COLOR] )
+    @attribute_value = Array.new(Attribute::COUNT)
+    @attribute_value[Attribute::POSITION]  = Array.new(@@attribute_size[Attribute::POSITION])
+    @attribute_value[Attribute::NORMAL]    = Array.new(@@attribute_size[Attribute::NORMAL])
+    @attribute_value[Attribute::TEXCOORD]  = Array.new(@@attribute_size[Attribute::TEXCOORD])
+    @attribute_value[Attribute::COLOR]     = Array.new(@@attribute_size[Attribute::COLOR])
 
     @light_pos = RVec3.new(0.0, 0.0, 0.0)
     @use_lighting = 0
@@ -176,17 +176,17 @@ class ImmediateDraw
     # VAO
     Mode::COUNT.times do |mode_idx|
       @vaos[mode_idx].each do |vao_id|
-        glDeleteVertexArrays(1, [vao_id].pack('L'))
+        GL.DeleteVertexArrays(1, [vao_id].pack('L'))
       end
       @vaos[mode_idx].clear
     end
   end
 
-  def set_light_position( x, y, z )
+  def set_light_position(x, y, z)
     @light_pos.setElements(x, y, z)
   end
 
-  def set_use_lighting( use )
+  def set_use_lighting(use)
     @use_lighting = use ? 1 : 0
   end
 
@@ -194,7 +194,7 @@ class ImmediateDraw
     return @use_lighting == 1
   end
 
-  def set_use_texture( use )
+  def set_use_texture(use)
     @use_texture = use ? 1 : 0
   end
 
@@ -202,7 +202,7 @@ class ImmediateDraw
     return @use_texture == 1
   end
 
-  def set_use_quad_conversion( use )
+  def set_use_quad_conversion(use)
     @enable_quad_conversion = use
   end
 
@@ -210,21 +210,21 @@ class ImmediateDraw
     return @enable_quad_conversion
   end
 
-  def set_matrix( mtx_model, mtx_view, mtx_proj )
+  def set_matrix(mtx_model, mtx_view, mtx_proj)
     @mtx_model = mtx_model
     @mtx_view = mtx_view
     @mtx_proj = mtx_proj
   end
 
-  def set_model_matrix( mtx_model )
+  def set_model_matrix(mtx_model)
     @mtx_model = mtx_model
   end
 
-  def vertex3f( x, y, z )
-    vertex4f( x, y, z, 1.0 )
+  def vertex3f(x, y, z)
+    vertex4f(x, y, z, 1.0)
   end
 
-  def vertex4f( x, y, z, w )
+  def vertex4f(x, y, z, w)
     @attribute_value[Attribute::POSITION][0] = x
     @attribute_value[Attribute::POSITION][1] = y
     @attribute_value[Attribute::POSITION][2] = z
@@ -239,29 +239,29 @@ class ImmediateDraw
     end
   end
 
-  def color3f( r, g, b )
-    color4f( r, g, b, 1.0 )
+  def color3f(r, g, b)
+    color4f(r, g, b, 1.0)
   end
 
-  def color4f( r, g, b, a )
+  def color4f(r, g, b, a)
     @attribute_value[Attribute::COLOR][0] = r
     @attribute_value[Attribute::COLOR][1] = g
     @attribute_value[Attribute::COLOR][2] = b
     @attribute_value[Attribute::COLOR][3] = a
   end
 
-  def normal3f( x, y, z )
+  def normal3f(x, y, z)
     @attribute_value[Attribute::NORMAL][0] = x
     @attribute_value[Attribute::NORMAL][1] = y
     @attribute_value[Attribute::NORMAL][2] = z
   end
 
-  def texcoord2f( u, v )
+  def texcoord2f(u, v)
     @attribute_value[Attribute::TEXCOORD][0] = u
     @attribute_value[Attribute::TEXCOORD][1] = v
   end
 
-  def begin_primitive( mode )
+  def begin_primitive(mode)
     raise RuntimeError if @begin_called == true
     @begin_called = true
 
@@ -269,12 +269,12 @@ class ImmediateDraw
 
     Attribute::COUNT.times do |attr_idx|
       @bufs[attr_idx][@prim_mode] << []
-      @vbos[attr_idx][@prim_mode] << BufferObject.new(GL_ARRAY_BUFFER)
+      @vbos[attr_idx][@prim_mode] << BufferObject.new(GL::ARRAY_BUFFER)
     end
 
     # Create VAO
     buf = Fiddle::Pointer.malloc(Fiddle::SIZEOF_INT)
-    glGenVertexArrays(1, buf)
+    GL.GenVertexArrays(1, buf)
     @vaos[@prim_mode] << buf[0, Fiddle::SIZEOF_INT].unpack('L')[0]
   end
 
@@ -293,17 +293,17 @@ class ImmediateDraw
     Attribute::COUNT.times do |attr_idx|
       data_ptr = Fiddle::Pointer[@bufs[attr_idx][@prim_mode].last.pack('F*')]
       data_count = @@attribute_size[attr_idx] * vtx_count
-      @vbos[attr_idx][@prim_mode].last.set_data( data_ptr, data_count )
+      @vbos[attr_idx][@prim_mode].last.set_data(data_ptr, data_count)
     end
 
     # Register to VAO
-    glBindVertexArray(@vaos[@prim_mode].last)
+    GL.BindVertexArray(@vaos[@prim_mode].last)
     Attribute::COUNT.times do |attr_idx|
-      glEnableVertexAttribArray(attr_idx)
+      GL.EnableVertexAttribArray(attr_idx)
       @vbos[attr_idx][@prim_mode].last.bind()
-      glVertexAttribPointer(attr_idx, @@attribute_size[attr_idx], GL_FLOAT, GL_FALSE, 0, NullPtr) # TODO : 頂点インターリーブ化
+      GL.VertexAttribPointer(attr_idx, @@attribute_size[attr_idx], GL::FLOAT, GL::FALSE, 0, NullPtr) # TODO : 頂点インターリーブ化
     end
-    glBindVertexArray(0)
+    GL.BindVertexArray(0)
 
   end
 
@@ -327,9 +327,9 @@ class ImmediateDraw
       end_primitive_count = @bufs[Attribute::POSITION][mode_idx].length
       end_primitive_count.times do |i|
         vtx_count = @bufs[Attribute::POSITION][mode_idx][i].length / @@attribute_size[Attribute::POSITION]
-        glBindVertexArray(@vaos[mode_idx][i])
-        glDrawArrays(@@mode_map[mode_idx], 0, vtx_count)
-        glBindVertexArray(0)
+        GL.BindVertexArray(@vaos[mode_idx][i])
+        GL.DrawArrays(@@mode_map[mode_idx], 0, vtx_count)
+        GL.BindVertexArray(0)
       end
     end
     @@immediate_shader.unuse
@@ -361,14 +361,14 @@ class ImmediateDraw
       @bufs[attr_idx][Mode::QUADS].pop
       @vbos[attr_idx][Mode::QUADS].pop.delete
       @bufs[attr_idx][Mode::TRIANGLES] << buf_tris
-      @vbos[attr_idx][Mode::TRIANGLES] << BufferObject.new(GL_ARRAY_BUFFER)
+      @vbos[attr_idx][Mode::TRIANGLES] << BufferObject.new(GL::ARRAY_BUFFER)
     end
 
     # VAO 再作成
     vao_id = @vaos[@prim_mode].pop
-    glDeleteVertexArrays(1, [vao_id].pack('L'))
+    GL.DeleteVertexArrays(1, [vao_id].pack('L'))
     buf = Fiddle::Pointer.malloc(Fiddle::SIZEOF_INT)
-    glGenVertexArrays(1, buf)
+    GL.GenVertexArrays(1, buf)
     @vaos[Mode::TRIANGLES] << buf[0, Fiddle::SIZEOF_INT].unpack('L')[0]
 
     # 現在の動作モードも QUADS -> TRIANGLES に変換して終了
@@ -398,14 +398,14 @@ class ImmediateDraw
       @bufs[attr_idx][Mode::QUAD_STRIP].pop
       @vbos[attr_idx][Mode::QUAD_STRIP].pop.delete
       @bufs[attr_idx][Mode::TRIANGLE_STRIP] << buf_tri_strip
-      @vbos[attr_idx][Mode::TRIANGLE_STRIP] << BufferObject.new(GL_ARRAY_BUFFER)
+      @vbos[attr_idx][Mode::TRIANGLE_STRIP] << BufferObject.new(GL::ARRAY_BUFFER)
     end
 
     # VAO 再作成
     vao_id = @vaos[@prim_mode].pop
-    glDeleteVertexArrays(1, [vao_id].pack('L'))
+    GL.DeleteVertexArrays(1, [vao_id].pack('L'))
     buf = Fiddle::Pointer.malloc(Fiddle::SIZEOF_INT)
-    glGenVertexArrays(1, buf)
+    GL.GenVertexArrays(1, buf)
     @vaos[Mode::TRIANGLE_STRIP] << buf[0, Fiddle::SIZEOF_INT].unpack('L')[0]
 
     # 現在の動作モードも QUAD_STRIP -> TRIANGLE_STRIP に変換して終了

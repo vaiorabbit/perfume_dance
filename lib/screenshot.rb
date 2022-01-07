@@ -3,7 +3,7 @@ require 'fiddle'
 require_relative 'utils'
 
 class ScreenShotSession
-  def initialize( width, height, depth, path="./tmp" )
+  def initialize(width, height, depth, path="./tmp")
     @width = width
     @height = height
     @depth = depth
@@ -18,10 +18,10 @@ class ScreenShotSession
   end
 
   def save()
-    glReadPixels( 0, 0, @width, @height,
-                  GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, @buffer );
-    filename = @session_name + sprintf( "_ID%05d.tga", @count )
-    File.open( @path + '/' + filename, 'wb' ) do |fout|
+    GL.ReadPixels(0, 0, @width, @height,
+                  GL::BGRA, GL::UNSIGNED_INT_8_8_8_8_REV, @buffer)
+    filename = @session_name + sprintf("_ID%05d.tga", @count)
+    File.open(@path + '/' + filename, 'wb') do |fout|
       fout.write [0].pack('c')           # identsize
       fout.write [0].pack('c')           # colourmaptype
       fout.write [2].pack('c')           # imagetype
@@ -40,12 +40,12 @@ class ScreenShotSession
     end
   end
 
-  def reset( width, height, depth )
+  def reset(width, height, depth)
   end
 
   def update_session_name()
     tm = Time.now
-    @session_name = sprintf( "ScreenShot_%4d%02d%02d%02d%02d%02d", tm.year, tm.month, tm.mday, tm.hour, tm.min, tm.sec )
+    @session_name = sprintf("ScreenShot_%4d%02d%02d%02d%02d%02d", tm.year, tm.month, tm.mday, tm.hour, tm.min, tm.sec)
   end
   private :update_session_name
 end
