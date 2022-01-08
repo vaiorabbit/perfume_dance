@@ -37,9 +37,7 @@ $height = 85.0
 
 # Press ESC to exit.
 key_callback = GLFW::create_callback(:GLFWkeyfun) do |window_handle, key, scancode, action, mods|
-  if key == GLFW::KEY_ESCAPE && action == GLFW::PRESS
-    GLFW.SetWindowShouldClose(window_handle, 1)
-  end
+  GLFW.SetWindowShouldClose(window_handle, 1) if key == GLFW::KEY_ESCAPE && action == GLFW::PRESS
 end
 
 size_callback = GLFW::create_callback(:GLFWwindowsizefun) do|window_handle, w, h|

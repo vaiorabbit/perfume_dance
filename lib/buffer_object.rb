@@ -15,7 +15,7 @@ class BufferObject
 
     buf = Fiddle::Pointer.malloc(Fiddle::SIZEOF_INT)
     GL.GenBuffers(1, buf)
-    @buffer_id = buf[0, Fiddle::SIZEOF_INT].unpack('L')[0]
+    @buffer_id = buf[0, Fiddle::SIZEOF_INT].unpack1('L')
 
     GL.BindBuffer(@buffer_target, @buffer_id)
     GL.BufferData(@buffer_target, @element_count * @element_size, NullPtr, buffer_usage)

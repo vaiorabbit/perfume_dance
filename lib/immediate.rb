@@ -275,7 +275,7 @@ class ImmediateDraw
     # Create VAO
     buf = Fiddle::Pointer.malloc(Fiddle::SIZEOF_INT)
     GL.GenVertexArrays(1, buf)
-    @vaos[@prim_mode] << buf[0, Fiddle::SIZEOF_INT].unpack('L')[0]
+    @vaos[@prim_mode] << buf[0, Fiddle::SIZEOF_INT].unpack1('L')
   end
 
   def end_primitive
@@ -369,7 +369,7 @@ class ImmediateDraw
     GL.DeleteVertexArrays(1, [vao_id].pack('L'))
     buf = Fiddle::Pointer.malloc(Fiddle::SIZEOF_INT)
     GL.GenVertexArrays(1, buf)
-    @vaos[Mode::TRIANGLES] << buf[0, Fiddle::SIZEOF_INT].unpack('L')[0]
+    @vaos[Mode::TRIANGLES] << buf[0, Fiddle::SIZEOF_INT].unpack1('L')
 
     # 現在の動作モードも QUADS -> TRIANGLES に変換して終了
     @prim_mode = Mode::TRIANGLES
@@ -406,7 +406,7 @@ class ImmediateDraw
     GL.DeleteVertexArrays(1, [vao_id].pack('L'))
     buf = Fiddle::Pointer.malloc(Fiddle::SIZEOF_INT)
     GL.GenVertexArrays(1, buf)
-    @vaos[Mode::TRIANGLE_STRIP] << buf[0, Fiddle::SIZEOF_INT].unpack('L')[0]
+    @vaos[Mode::TRIANGLE_STRIP] << buf[0, Fiddle::SIZEOF_INT].unpack1('L')
 
     # 現在の動作モードも QUAD_STRIP -> TRIANGLE_STRIP に変換して終了
     @prim_mode = Mode::TRIANGLE_STRIP

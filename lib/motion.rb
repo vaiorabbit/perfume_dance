@@ -118,7 +118,7 @@ module Motion
       dot = RVec3.dot(XAxis, dir)
       bone_rot_axis = (1.0 - dot.abs <= RMath3D::TOLERANCE) ? ZAxis : RVec3.cross(XAxis, dir).normalize!
       bone_rot_theta = Math.acos(dot)
-puts "#{@name} : #{bone_rot_axis}"
+      # puts "#{@name} : #{bone_rot_axis}"
       @mtx_bone_rotation.rotationAxis(bone_rot_axis, bone_rot_theta)
     end
 
