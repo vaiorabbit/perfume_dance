@@ -128,11 +128,11 @@ if __FILE__ == $PROGRAM_NAME
 
   mtx_model = RMtx4.new.setIdentity
 
-  width_ptr = '        '
-  height_ptr = '        '
-  GLFW.GetFramebufferSize(window, width_ptr, height_ptr)
-  width = width_ptr.unpack1('L')
-  height = height_ptr.unpack1('L')
+  width_buf = ' ' * 8
+  height_buf = ' ' * 8
+  GLFW.GetFramebufferSize(window, width_buf, height_buf)
+  width = width_buf.unpack1('L')
+  height = height_buf.unpack1('L')
   size_callback.call(window, width, height)
 
   ImmediateDraw.setup
