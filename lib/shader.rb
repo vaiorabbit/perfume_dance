@@ -96,7 +96,7 @@ class Shader
       # return
     end
     case args[0]
-    when Fixnum
+    when Integer
       case args.length
       when 1; GL.Uniform1i(loc, args[0])
       when 2; GL.Uniform2i(loc, args[0], args[1])

@@ -1,7 +1,7 @@
 # Perfume Dance #
 
 *   Created : 2014-05-12
-*   Last modified : 2021-01-08
+*   Last modified : 2023-10-08
 
 <img src="https://raw.githubusercontent.com/vaiorabbit/perfume_dance/master/doc/perfume_dance_00.png" width="200"> <img src="https://raw.githubusercontent.com/vaiorabbit/perfume_dance/master/doc/perfume_dance_01.png" width="200"> <img src="https://raw.githubusercontent.com/vaiorabbit/perfume_dance/master/doc/perfume_dance_02.png" width="200">
 
@@ -54,7 +54,7 @@ A BVH motion parser and playback implementation used to make the video:
 All source codes are available under the terms of the zlib/libpng license.
 
     Perfume Dance
-    Copyright (c) 2014-2021 vaiorabbit
+    Copyright (c) 2014-2023 vaiorabbit
 
     This software is provided 'as-is', without any express or implied
     warranty. In no event will the authors be held liable for any damages
